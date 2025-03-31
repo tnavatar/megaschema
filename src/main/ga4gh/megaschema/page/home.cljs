@@ -358,6 +358,68 @@
  ::selected-class
  :-> ::selected-class)
 
+(def source-icon
+  {:ga4gh/va-spec
+   [:svg
+    {:xmlns "http://www.w3.org/2000/svg",
+     :fill "none",
+     :viewBox "0 0 24 24",
+     :stroke-width "1.5",
+     :stroke "currentColor",
+     :class "size-6"}
+    [:path
+     {:stroke-linecap "round",
+      :stroke-linejoin "round",
+      :d
+      "M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"}]
+    [:path
+     {:stroke-linecap "round",
+      :stroke-linejoin "round", 
+      :d "M6 6h.008v.008H6V6Z"}]]
+   :ga4gh/vrs
+   [:svg
+    {:xmlns "http://www.w3.org/2000/svg",
+     :fill "none",
+     :viewBox "0 0 24 24",
+     :stroke-width "1.5",
+     :stroke "currentColor",
+     :class "size-6"}
+    [:path
+     {:stroke-linecap "round",
+      :stroke-linejoin "round",
+      :d "M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"}]
+    [:path
+     {:stroke-linecap "round",
+      :stroke-linejoin "round",
+      :d
+      "M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"}]]
+   :ga4gh/gks-core
+   [:svg
+    {:xmlns "http://www.w3.org/2000/svg",
+     :fill "none",
+     :viewBox "0 0 24 24",
+     :stroke-width "1.5",
+     :stroke "currentColor",
+     :class "size-6"}
+    [:path
+     {:stroke-linecap "round",
+      :stroke-linejoin "round",
+      :d
+      "m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25"}]]
+   :ga4gh/cat-vrs
+   [:svg
+    {:xmlns "http://www.w3.org/2000/svg",
+     :fill "none",
+     :viewBox "0 0 24 24",
+     :stroke-width "1.5",
+     :stroke "currentColor",
+     :class "size-6"}
+    [:path
+     {:stroke-linecap "round",
+      :stroke-linejoin "round",
+      :d
+      "M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25"}]]})
+
 (defn menu-class [[class-name attrs]]
   ^{:key class-name}
   [:li
@@ -366,6 +428,7 @@
      :class
      "group flex gap-x-3 rounded-md p-1 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
      :on-click #(re-frame/dispatch [::select-class class-name])}
+    (source-icon (:source attrs))
     (name class-name)]])
 
 (defn menu []
@@ -389,6 +452,8 @@
       {:role "list", :class "-mx-2 space-y-1"}
       (for [c @(re-frame/subscribe [::filtered-classes])]
         (menu-class c))]]]])
+
+"https://vrs.ga4gh.org/en/stable/concepts/MolecularVariation/index.html#molecular-variation"
 
 (defn display-class []
   (let [c @(re-frame/subscribe [::selected-class])
