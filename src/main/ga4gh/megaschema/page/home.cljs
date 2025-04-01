@@ -432,22 +432,59 @@
      "group flex gap-x-3 rounded-md p-1 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
      :on-click #(re-frame/dispatch [::select-class class-name])}
     (source-icon (:source attrs))
-    (kw->s class-name)]])
+    [:div
+     {:class "flex max-w-72"}
+     (kw->s class-name)]]])
+
+(declare property-type-div)
+
+(defn one-of-div [values]
+  [:div
+   {:class "flex gap-4"}
+   (for [v values]
+     ^{:key v}
+     (property-type-div v))])
+
+(defn property-type-div [attrs]
+  (cond
+    (:const attrs) [:div "const"]
+    (:oneOf attrs) (one-of-div (:oneOf attrs))
+    (:type attrs) [:div (:type attrs)]
+    (:ref attrs) [:div (re-find #"\w*$" (:ref attrs))]
+    (:refCurie attrs) [:div (:refCurie attrs)]
+    :default [:div "not found"]))
+
+(defn property-list [properties]
+  [:ul
+   {:class "pl-8"}
+   (for [[prop-name attrs] properties]
+     ^{:key prop-name}
+     [:li
+      {:class "flex flex-col gap-1 pb-6"}
+      [:div
+       {:class "flex"}
+       [:div
+        {:class "font-medium "}
+        prop-name]
+       [:div
+        {:class "font-light text-sm px-3 items-center flex"}
+        (property-type-div attrs)]]
+      [:div (:description attrs)]])])
 
 (defn menu []
   [:div
    {:class
-    "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"}
+    "fixed inset-y-0 z-50 flex w-96 flex-col"}
    [:div
     {:class
      "flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6"}
     [:div
      {:class "flex h-16 shrink-0 items-center"}
      [:img
-      {:class "h-12 w-auto",
+      {:class "h-16 mt-10 w-auto",
        :src
        "img/logo-full-color.svg" 
-       :alt "Your Company"}]]
+       :alt "GA4GH"}]]
     [:nav
      {:class "flex flex-1 flex-col"}
      (search)
@@ -458,19 +495,89 @@
 
 "https://vrs.ga4gh.org/en/stable/concepts/MolecularVariation/index.html#molecular-variation"
 
+
+(def pill-properties
+  {"trial use" {:text "trial use"
+                :css "bg-gray-200 text-gray-600"}
+   "draft" {:text "draft"
+                :css "bg-gray-200 text-gray-600"}
+   "object" {:text "class"
+             :css "bg-gray-200 text-gray-600"}
+   "abstract class" {:text "abstract class"
+                     :css "bg-gray-200 text-gray-600"}
+   "string" {:text "string"
+             :css "bg-gray-200 text-gray-600"}
+   :ga4gh/cat-vrs {:text "CatVRS"
+                   :css "bg-gray-200 text-gray-600"}
+   :ga4gh/gks-core {:text "GKS Core"
+                    :css "bg-gray-200 text-gray-600"}
+   :ga4gh/va-spec {:text "VA Spec"
+                   :css "bg-gray-200 text-gray-600"}
+   :ga4gh/vrs {:text "VRS"
+               :css "bg-gray-200 text-gray-600"}})
+
+(defn pill [element]
+  (let [{:keys [text css]} (pill-properties element)]
+    [:div
+     {:class (str "flex px-2 rounded-full " css)}
+     (or text element)]))
+
+(def left-arrow
+  [:svg
+   {:xmlns "http://www.w3.org/2000/svg",
+    :fill "none",
+    :viewBox "0 0 24 24",
+    :stroke-width "1.5",
+    :stroke "currentColor",
+    :class "size-6"}
+   [:path
+    {:stroke-linecap "round",
+     :stroke-linejoin "round", 
+     :d "M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"}]])
+
+(def left-arrow-micro
+  [:svg
+   {:xmlns "http://www.w3.org/2000/svg",
+    :viewBox "0 0 16 16",
+    :fill "currentColor",
+    :class "size-4"}
+   [:path
+    {:fill-rule "evenodd",
+     :d
+     "M14 8a.75.75 0 0 1-.75.75H4.56l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 1.06L4.56 7.25h8.69A.75.75 0 0 1 14 8Z",
+     :clip-rule "evenodd"}]])
+
 (defn display-class []
   (let [c @(re-frame/subscribe [::selected-class])
         class-schema (get schema/schema c)]
     [:div
-     [:div (kw->s c)]
-     [:div (:description class-schema)]
-     [:ul]]))
+     {:class "flex flex-col px-4 sm:px-6 lg:px-8"}
+     [:div
+      {:class "flex gap-1 font-semibold text-xl pt-6 pb-2"}
+      [:div (kw->s c)]
+      (when-let [inherited-class (:inherits class-schema)]
+        [:div
+         {:class "flex text-gray-400 px-2"}
+         [:div
+          {:class "flex items-center px-1"}
+          left-arrow-micro]
+         [:div
+          {:class "text-base flex items-center text-base"}
+          inherited-class]])]
+     [:div
+      {:class "flex pb-10 gap-2"}
+      (pill (:type class-schema "abstract class"))
+      (pill (:maturity class-schema))
+      (pill (:source class-schema))]
+     
+     [:div
+      {:class "flex pb-10"}
+      (:description class-schema)]
+     (property-list (:properties class-schema))]))
 
 (defn home []
   [:div
    (menu)
    [:main
-    {:class "py-10 lg:pl-72"}
-    [:div
-     {:class "px-4 sm:px-6 lg:px-8"}
-     (display-class)]]])
+    {:class "py-10 pl-96"}
+    (display-class)]])
