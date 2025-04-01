@@ -453,7 +453,7 @@
     (:ref attrs) [:div (re-find #"\w*$" (:ref attrs))]
     (:refCurie attrs) [:div (:refCurie attrs)]
     (:enum attrs) [:div "enum"]
-    :default [:div "not found"]))
+    :default [:div "-"]))
 
 (defn property-list [properties]
   [:ul
