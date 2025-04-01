@@ -351,7 +351,7 @@
 (re-frame/reg-event-db
  ::select-class
  (fn [db [_ class]]
-   (js/console.log (name class))
+   (js/console.log (str class))
    (assoc db ::selected-class class)))
 
 (re-frame/reg-sub
@@ -429,7 +429,7 @@
      "group flex gap-x-3 rounded-md p-1 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
      :on-click #(re-frame/dispatch [::select-class class-name])}
     (source-icon (:source attrs))
-    (name class-name)]])
+    (str class-name)]])
 
 (defn menu []
   [:div
@@ -459,9 +459,8 @@
   (let [c @(re-frame/subscribe [::selected-class])
         class-schema (get schema/schema c)]
     [:div
-     [:div (name c)]
+     [:div (str c)]
      [:div (:description class-schema)]
-     [:div (:$comment class-schema)]
      [:ul]]))
 
 (defn home []
