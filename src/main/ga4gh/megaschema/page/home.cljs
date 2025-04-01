@@ -420,6 +420,9 @@
       :d
       "M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25"}]]})
 
+(defn kw->s [kw]
+  (s/replace (str kw) #":" ""))
+
 (defn menu-class [[class-name attrs]]
   ^{:key class-name}
   [:li
@@ -429,7 +432,7 @@
      "group flex gap-x-3 rounded-md p-1 text-sm/6 font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
      :on-click #(re-frame/dispatch [::select-class class-name])}
     (source-icon (:source attrs))
-    (str class-name)]])
+    (kw->s class-name)]])
 
 (defn menu []
   [:div
@@ -459,7 +462,7 @@
   (let [c @(re-frame/subscribe [::selected-class])
         class-schema (get schema/schema c)]
     [:div
-     [:div (str c)]
+     [:div (kw->s c)]
      [:div (:description class-schema)]
      [:ul]]))
 
